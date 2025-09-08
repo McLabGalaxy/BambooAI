@@ -1,0 +1,1905 @@
+@prefix ys:      <http://finance.yahoo.com/stock#> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+##################################################################
+### 1.  Ontology declaration – import the sport data ontology  ###
+##################################################################
+ys:StockPriceOntology a owl:Ontology ;
+                       owl:imports <http://finance.yahoo.com/sport-ontology> .  # [2]
+
+##################################################################
+### 2.  Domain classes (inspired by the domain style)  ###
+##################################################################
+ys:StockSymbol rdf:type owl:Class ;
+         rdfs:comment "A stock entity representing a publicly traded company." .
+
+ys:StockPriceRecord rdf:type owl:Class ;
+    rdfs:subClassOf ys:Timeseries ;
+    rdfs:label "Stock Trading Day Price Record" ;
+    rdfs:comment "A single row in a stock trading price record (one trading day)." .
+
+ys:StockPriceDataframe rdf:type owl:Class ;
+                   rdfs:subClassOf ys:Dataframe ;
+                   rdfs:comment "A container for multiple stock price records, organized as time series data." .
+
+ys:StockPriceDataframeIndex rdf:type owl:Class ;
+                        rdfs:subClassOf ys:Index ;
+                        rdfs:comment "stock_trading_date-indexed summary providing a condensed view of stock price records with aggregated metrics. Enables quick filtering and reference to detailed data in the original Dataframe." .
+
+ys:StockPriceMeasurement
+    rdf:type owl:Class ;
+    rdfs:subClassOf ys:Measurement ;
+    rdfs:label "Stock Price Measurement" ;
+    rdfs:comment "A single value in the Stock Price Measurement, representing measurements at a specific timestamp within a trading day record." .
+
+#################################################################
+#  Core Classes
+#################################################################
+
+ys:DataObjects rdf:type owl:Class .
+
+ys:Dataframe rdf:type owl:Class ;
+           rdfs:subClassOf ys:Timeseries .
+
+ys:DatasourceType rdf:type owl:Class .
+
+ys:Derived rdf:type owl:Class ;
+         rdfs:subClassOf ys:MeasurementType .
+
+ys:DirectlyMeasured rdf:type owl:Class ;
+                  rdfs:subClassOf ys:MeasurementType .
+
+ys:Environmental rdf:type owl:Class ;
+               rdfs:subClassOf ys:MeasurementCategory .
+
+ys:Function rdf:type owl:Class .
+
+ys:Geospatial rdf:type owl:Class ;
+            rdfs:subClassOf ys:MeasurementCategory .
+
+ys:Index rdf:type owl:Class ;
+       rdfs:subClassOf ys:DataObjects .
+
+ys:Instrument rdf:type owl:Class .
+
+ys:Key rdf:type owl:Class .
+
+ys:List rdf:type owl:Class ;
+      rdfs:subClassOf ys:DataObjects ;
+      rdfs:comment "A list of computed values" .
+
+ys:Map rdf:type owl:Class ;
+     rdfs:subClassOf ys:VisualObjects .
+
+ys:Measurement rdf:type owl:Class ;
+             rdfs:subClassOf ys:DataObjects .
+
+ys:MeasurementCategory rdf:type owl:Class .
+
+ys:MeasurementType rdf:type owl:Class .
+
+ys:Mechanical rdf:type owl:Class ;
+            rdfs:subClassOf ys:MeasurementCategory .
+
+ys:Signal rdf:type owl:Class ;
+           rdfs:subClassOf ys:MeasurementCategory .
+
+ys:Plot2D rdf:type owl:Class ;
+        rdfs:subClassOf ys:VisualObjects .
+
+ys:Plot3D rdf:type owl:Class ;
+        rdfs:subClassOf ys:VisualObjects .
+
+ys:PreComputed rdf:type owl:Class ;
+             rdfs:subClassOf ys:MeasurementType .
+
+ys:Primary rdf:type owl:Class ;
+         rdfs:subClassOf ys:DatasourceType .
+
+ys:Scalar rdf:type owl:Class ;
+        rdfs:subClassOf ys:DataObjects .
+
+ys:Secondary rdf:type owl:Class ;
+           rdfs:subClassOf ys:DatasourceType .
+
+ys:Segment rdf:type owl:Class ;
+         rdfs:subClassOf ys:Timeseries ;
+         rdfs:comment "A single activity segment, containing multiple measurements at regular intervals. Can be refered to as lap, Interval, time_segment or distance_segment" .
+
+ys:Temporal rdf:type owl:Class ;
+          rdfs:subClassOf ys:MeasurementCategory .
+
+ys:Timeseries rdf:type owl:Class ;
+            rdfs:subClassOf ys:DataObjects ;
+            rdfs:comment "A sequence of records indexed in time order." .
+
+ys:Velocity rdf:type owl:Class ;
+          rdfs:subClassOf ys:MeasurementCategory .
+
+ys:VisualObjects rdf:type owl:Class .
+
+## Trading Objects
+
+ys:PredictStockEntryPrice rdf:type owl:Class ;
+          rdfs:subClassOf ys:Measurement ;        
+          rdfs:label "Predict Stock Entry Price" .
+
+ys:PredictStockSellingPrice rdf:type owl:Class ;
+          rdfs:subClassOf ys:Measurement ;        
+          rdfs:label "Predict Stock Selling Price" .
+
+ys:PredictStockStopLossPrice rdf:type owl:Class ;
+          rdfs:subClassOf ys:Measurement ;        
+          rdfs:label "Predict Stock Stop Loss Price" .
+
+ys:ComputeStockAverageClosePrice rdf:type owl:Class ;
+          rdfs:subClassOf ys:Measurement ;
+          rdfs:label "Calculate Stock Average Close Price" .
+
+ys:BacktestingSMACrossoverStrategy rdf:type owl:Class ;
+          rdfs:subClassOf ys:Measurement ;        
+          rdfs:label "Backtesting SMA Crossover Strategy" .
+
+ys:FetchStockPriceHistoricalData rdf:type owl:Class ;
+          rdfs:subClassOf ys:Measurement ;
+          rdfs:label "Fetch Stock Price Historical Data" .
+
+ys:StockPriceAnalysisWithTechnicalIndicator rdf:type owl:Class ;
+          rdfs:subClassOf ys:Measurement ;
+          rdfs:label "Comprehensive Stock Price Analysis with Technical Indicator" .
+
+ys:StockPriceHeadAndShoulderPatternDetection rdf:type owl:Class ;
+          rdfs:subClassOf ys:Measurement ;
+          rdfs:label "identification of Head and Shoulder (H&S) and Inverse Head and Shoulder (IH&S) and neckline patterns in stock data." .
+
+
+#################################################################
+### 3.  Relationship between a Stock and its daily records ###
+#################################################################
+
+ys:containsStockSymbol rdf:type owl:ObjectProperty ;
+                  rdfs:domain ys:StockPriceDataframe ;
+                  rdfs:range ys:StockSymbol .
+
+ys:containsStockPriceRecord rdf:type owl:ObjectProperty ;
+                  rdfs:domain ys:StockPriceDataframe ;
+                  rdfs:range ys:StockPriceRecord .
+
+ys:containsSegment rdf:type owl:ObjectProperty ;
+                 rdfs:domain ys:StockPriceRecord ;
+                 rdfs:range ys:Segment .
+
+ys:containsPriceMeasurements rdf:type owl:ObjectProperty ;
+                 rdfs:domain ys:Segment ;
+                 rdfs:range ys:StockPriceMeasurement .
+
+ys:containsStockPriceRecordAggregate rdf:type owl:ObjectProperty ;
+                           rdfs:domain ys:StockPriceDataframe ;
+                           rdfs:range ys:StockPriceMeasurement .
+
+
+#################################################################
+#    Object Properties
+#################################################################
+
+ys:applicableToDataObject rdf:type owl:ObjectProperty ;
+                        rdfs:domain ys:Function ;
+                        rdfs:range ys:DataObjects .
+
+ys:canBeComputedUsingFunction rdf:type owl:ObjectProperty ;
+                            rdfs:domain ys:DataObjects ;
+                            rdfs:range ys:Function .
+
+ys:derivedFrom rdf:type owl:ObjectProperty ;
+             rdfs:domain ys:Derived ;
+             rdfs:range ys:DirectlyMeasured ,
+                        ys:PreComputed .
+
+ys:functionRequiresMeasurements rdf:type owl:ObjectProperty ;
+                              rdfs:domain ys:Function ;
+                              rdfs:range ys:MeasurementCategory .
+
+ys:groupedBy rdf:type owl:ObjectProperty ;
+           rdfs:domain ys:DataObjects ;
+           rdfs:range ys:Key .
+
+ys:hasRelation rdf:type owl:ObjectProperty ;
+             rdfs:domain ys:Key ,
+                         ys:Measurement ;
+             rdfs:range ys:Key .
+
+ys:hasUniqueIdentifier rdf:type owl:ObjectProperty ;
+                     rdfs:domain ys:DataObjects ,
+                                 ys:MeasurementCategory ;
+                     rdfs:range ys:Key .
+
+ys:preComputedFrom rdf:type owl:ObjectProperty ;
+                 rdfs:domain ys:PreComputed ;
+                 rdfs:range ys:DirectlyMeasured ,
+                            ys:PreComputed .
+
+#################################################################
+### 4.  Data‑properties that hold the numeric and date values ###
+#################################################################
+
+ys:openPrice rdf:type owl:DatatypeProperty ;
+             rdfs:domain ys:StockPriceRecord ;
+             rdfs:range xsd:decimal .
+
+ys:highPrice rdf:type owl:DatatypeProperty ;
+             rdfs:domain ys:StockPriceRecord ;
+             rdfs:range xsd:decimal .
+
+ys:lowPrice rdf:type owl:DatatypeProperty ;
+            rdfs:domain ys:StockPriceRecord ;
+            rdfs:range xsd:decimal .
+
+ys:closePrice rdf:type owl:DatatypeProperty ;
+              rdfs:domain ys:StockPriceRecord ;
+              rdfs:range xsd:decimal .
+
+ys:adjClosePrice rdf:type owl:DatatypeProperty ;
+                 rdfs:domain ys:StockPriceRecord ;
+                 rdfs:range xsd:decimal .
+
+ys:volume rdf:type owl:DatatypeProperty ;
+          rdfs:domain ys:StockPriceRecord ;
+          rdfs:range xsd:integer .
+
+#################################################################
+#    Core Data properties
+#################################################################
+
+ys:allowedValues rdf:type owl:DatatypeProperty ;
+                 rdfs:domain ys:Key ;
+                 rdfs:range xsd:string .
+
+ys:computeTimeseriesStats rdf:type owl:DatatypeProperty ;
+                                rdfs:domain ys:Timeseries ;
+                                rdfs:range xsd:string .
+
+ys:derivedUsingFormula rdf:type owl:DatatypeProperty ;
+                                rdfs:domain ys:Measurement ;
+                                rdfs:range xsd:string .
+
+ys:functionDefinition rdf:type owl:DatatypeProperty ;
+                                rdfs:domain ys:Function ;
+                                rdfs:range xsd:string .
+
+ys:isPresentInDataset rdf:type owl:DatatypeProperty ;
+                                rdfs:domain ys:Key ,
+                                ys:Measurement ;
+                                rdfs:range xsd:boolean .
+
+ys:measuredInUnits rdf:type owl:DatatypeProperty ;
+                            rdfs:domain ys:Measurement ;
+                            rdfs:range xsd:string .
+
+ys:recordedWithFrequency rdf:type owl:DatatypeProperty ;
+                                  rdfs:domain ys:Measurement ;
+                                  rdfs:range xsd:string .
+
+#################################################################
+#    Individuals
+#################################################################
+
+ys:date rdf:type owl:NamedIndividual ;
+        rdf:type ys:DirectlyMeasured ;
+        rdf:type ys:Key ;
+        rdf:type ys:Temporal ;
+        rdf:type ys:StockPriceRecord ;
+        rdf:type ys:StockPriceMeasurement ;
+        rdfs:label "date measurement" ;
+        ys:hasRelation ys:stock_price_record_dataframe_index ;
+        ys:isPresentInDataset "true"^^xsd:boolean ;
+        ys:measuredInUnits "ISO 8601" ;
+        ys:recordedWithFrequency "1 Day" .
+
+ys:open rdf:type owl:NamedIndividual ,
+                   ys:Temporal ,
+                   ys:StockPriceRecord ,
+                   ys:StockPriceMeasurement ;
+          ys:hasRelation ys:stock_symbol ,
+                         ys:stock_price_record ;
+          ys:isPresentInDataset "true"^^xsd:boolean ;
+          ys:measuredInUnits "USD (US Dollar)" ;
+          ys:recordedWithFrequency "1 Day" ;
+          rdfs:comment "Stock Opening price of the stock on that day." .
+
+ys:close rdf:type owl:NamedIndividual ,
+                   ys:DirectlyMeasured ,
+                   ys:Temporal ,
+                   ys:StockPriceRecord ,
+                   ys:StockPriceMeasurement ;
+          ys:hasRelation ys:stock_symbol ,
+                         ys:stock_price_record ;
+          ys:isPresentInDataset "true"^^xsd:boolean ;
+          ys:measuredInUnits "USD (US Dollar)" ;
+          ys:recordedWithFrequency "1 Day" ;
+          rdfs:comment "Stock Closing price of the stock on that day." .
+
+ys:high rdf:type owl:NamedIndividual ,
+                   ys:DirectlyMeasured ,
+                   ys:Temporal ,
+                   ys:StockPriceRecord ,
+                   ys:StockPriceMeasurement ;
+          ys:hasRelation ys:stock_symbol ,
+                       ys:stock_price_record ;
+          ys:isPresentInDataset "true"^^xsd:boolean ;
+          ys:measuredInUnits "USD (US Dollar)" ;
+          ys:recordedWithFrequency "1 Day" ;
+          rdfs:comment "Stock High price of the stock on that day." .
+
+ys:low rdf:type owl:NamedIndividual ,
+                   ys:DirectlyMeasured ,
+                   ys:Temporal ,
+                   ys:StockPriceRecord ,
+                   ys:StockPriceMeasurement ;
+          ys:hasRelation ys:stock_symbol ,
+                       ys:stock_price_record ;
+          ys:isPresentInDataset "true"^^xsd:boolean ;
+          ys:measuredInUnits "USD (US Dollar)" ;
+          ys:recordedWithFrequency "1 Day" ;
+          rdfs:comment "Stock Low price of the stock on that day." .
+
+ys:adjclose rdf:type owl:NamedIndividual ,
+                   ys:DirectlyMeasured ,
+                   ys:Temporal ,
+                   ys:StockPriceRecord ,
+                   ys:StockPriceMeasurement ;
+          ys:hasRelation ys:stock_symbol ,
+                       ys:stock_price_record ;
+          ys:isPresentInDataset "true"^^xsd:boolean ;
+          ys:measuredInUnits "USD (US Dollar)" ;
+          ys:recordedWithFrequency "1 Day" ;
+          rdfs:comment "Stock Adjusted closed price of the stock on that day." .
+
+ys:volume rdf:type owl:NamedIndividual ,
+                   ys:DirectlyMeasured ,
+                   ys:Temporal ,
+                   ys:StockPriceRecord ,
+                   ys:StockPriceMeasurement ;
+          ys:hasRelation ys:stock_symbol ,
+                       ys:stock_price_record ;
+          ys:isPresentInDataset "true"^^xsd:boolean ;
+          ys:measuredInUnits "Shares (Stock Shares)" ;
+          ys:recordedWithFrequency "1 Day" ;
+          rdfs:comment "Stock Trading Volume of the stock on that day." .
+
+ys:company_name rdf:type owl:NamedIndividual ;
+                        rdf:type ys:Key ;
+                ys:hasRelation ys:stock_symbol_id ;
+                ys:isPresentInDataset "true"^^xsd:boolean .
+
+ys:stock_symbol_id rdf:type owl:NamedIndividual ;
+                        rdf:type ys:Key ;
+                   ys:hasRelation ys:stock_price_record_id ;
+                   ys:isPresentInDataset "true"^^xsd:boolean .
+
+ys:stock_symbol rdf:type owl:NamedIndividual ;
+                        rdf:type ys:StockSymbol ;
+                ys:groupedBy ys:stock_symbol_id ;
+                ys:hasUniqueIdentifier ys:stock_symbol_id .
+
+ys:stock_price_record_id rdf:type owl:NamedIndividual ;
+                                rdf:type ys:Key ;
+                         ys:hasRelation ys:stock_symbol_id ;
+                         ys:isPresentInDataset "true"^^xsd:boolean .
+
+ys:stock_price_record rdf:type owl:NamedIndividual ;
+                        rdf:type ys:StockPriceRecord ;
+                        rdfs:label "stock price record" ;
+                        ys:hasRelation ys:date ,
+                                        ys:open ,
+                                        ys:close ,
+                                        ys:high ,
+                                        ys:adjclose ,
+                                        ys:low ,
+                                        ys:volume ,
+                                        ys:stock_symbol ;
+                       ys:groupedBy ys:date ;
+                       ys:hasUniqueIdentifier ys:date .
+
+
+ys:stock rdf:type owl:NamedIndividual ;
+                rdf:type ys:Stock ;
+         ys:containsStockSymbol ys:stock_symbol ;
+         ys:groupedBy ys:stock_symbol_id ;
+         ys:hasUniqueIdentifier ys:stock_symbol_id .
+
+ys:stock_price_dataframe rdf:type owl:NamedIndividual ;
+                                rdf:type ys:StockPriceDataframe ;
+                         rdf:type ys:Primary ;
+                         ys:containsStockPriceRecord ys:stock_price_record .
+
+ys:stock_price_dataframe_index rdf:type owl:NamedIndividual ;
+                                rdf:type ys:StockPriceDataframeIndex ;
+                               ys:hasRelation ys:stock_symbol_id ;
+                               ys:groupedBy ys:date ;
+                               ys:hasUniqueIdentifier ys:date .
+
+ys:segment_id rdf:type owl:NamedIndividual ,
+                        ys:Key ;
+                        ys:canBeComputedUsingFunction ys:determine_segments_function ;
+                        ys:hasRelation ys:date ;
+                        ys:isPresentInDataset "true"^^xsd:boolean .
+
+#################################################################
+#    Helper functions
+#################################################################
+
+ys:stock_price_change rdf:type owl:NamedIndividual ,
+                   ys:StockPriceMeasurement ,
+                   ys:StockPriceRecord ,
+                   ys:PreComputed ;
+          ys:derivedFrom ys:open ,
+                         ys:close ;                
+          ys:hasRelation ys:date , 
+                         ys:open ,
+                         ys:close ;
+        ys:derivedUsingFormula """# Compute price change
+        
+price_change = close - open
+return price_change""" ;                    
+          ys:isPresentInDataset "true"^^xsd:boolean ;
+          ys:measuredInUnits "USD" ;
+          ys:recordedWithFrequency "1 day" ;
+          rdfs:comment "price change after stock trading" .
+
+# ys:compute_stock_average_close_price rdf:type owl:NamedIndividual ,
+#                   ys:ComputeStockAverageClosePrice ;
+#          rdfs:label "compute stock average close price" ;
+#          ys:canBeComputedUsingFunction ys:compute_stock_average_close_price_function .
+
+ys:calculate_stock_average_close_price_function rdf:type owl:NamedIndividual ,
+     ys:Function ;
+    ys:applicableToDataObject ys:stock_price_record ;    
+    rdfs:label "compute stock average close price" ;
+    ys:functionRequiresMeasurements ys:date ,
+                                  ys:close ;
+    ys:functionDefinition """
+
+Imports:
+    import pandas as pd
+
+Parameters:
+    df (pandas.DataFrame): DataFrame containing at least 'date' and 'close'  columns.
+
+Returns:
+    float: Average close price
+
+Function Body:    
+    # Ensure the DataFrame is sorted by datetime
+    df['datetime'] = pd.to_datetime(df['datetime'])
+    df = df.sort_values('datetime')
+    # Filter out rows with missing or zero values for close
+    df = df[(df['close'] > 0)]
+    # If there's not enough data after filtering, return NaN
+    if len(df) < 1:
+        return np.nan
+    return df['close'].mean()""" ;
+            rdfs:comment "This function is used  to measure stock price trends during trading sessions by analyzing how close prices change over time, helping identify market patterns and trading opportunities." .
+
+ys:predict_stock_entry_price rdf:type owl:NamedIndividual ,
+                ys:PredictStockEntryPrice ;
+                ys:canBeComputedUsingFunction ys:predict_stock_entry_price_function .
+
+ys:predict_stock_entry_price_function rdf:type owl:NamedIndividual ,
+                ys:Function ;
+                ys:applicableToDataObject ys:stock_price_record ;
+                rdfs:label "predict the stock entry price that will maximizes potential profit for next week." ;
+                ys:functionRequiresMeasurements ys:stock_symbol,
+                                                ys:date ,
+                                                ys:close ;
+                ys:functionDefinition """
+Imports:
+    import pandas as pd
+    import numpy as np
+    from prophet import Prophet
+    from typing import Dict, Any
+
+Parameters:
+    df (pandas.DataFrame): DataFrame containing at least 'date','open','high','low','close' and 'volume' columns.
+
+Returns:
+    dict: forecast_result
+
+Function Body:    
+    # ===========================================================================================
+    # Build a forecasting model
+    # ===========================================================================================
+    ## Prophet expects columns 'ds' (date) and 'y' (value)
+    df_prophet = df[['Close']].reset_index().rename(columns={'Date':'ds', 'Close':'y'})
+    m = Prophet(weekly_seasonality=True, daily_seasonality=False)
+    m.fit(df_prophet)
+
+    future = m.make_future_dataframe(periods=7)   # 7 days ahead
+    forecast = m.predict(future)
+
+    # Extract the last 7 rows (next week)
+    next_week = forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']].tail(7)
+    print(next_week)
+    # ===========================================================================================
+    # Entry logic
+    # ===========================================================================================
+    # Trend check - If the last few daily closes are higher than the moving average, consider a bullish bias.
+    # Entry price - A common rule is to buy at the next open after the last close, or at a small premium (e.g., +0.5%) if the trend is strong.
+    # Leverage - Decide a fixed multiplier (e.g., 2x) based on your risk tolerance.
+    # Stop-loss - Set a percentage below the entry (e.g., 1-2%) or a few points below the predicted low.
+    # Take-profit - Set a percentage above the entry (e.g., 3-5%) or a few points above the predicted high.    
+
+    # Simple trend check
+    short_ma = df['Close'].rolling(window=5).mean().iloc[-1]
+    long_ma  = df['Close'].rolling(window=20).mean().iloc[-1]
+    bullish  = short_ma > long_ma
+
+    # Predict next week's high/low/close from the forecast
+    predicted_high = next_week['yhat_upper'].max()
+    predicted_low  = next_week['yhat_lower'].min()
+    predicted_close = next_week['yhat'].iloc[-1]
+
+    # Entry
+    entry_price = df['Close'].iloc[-1] * (1.005 if bullish else 1.0)
+
+    # Leverage
+    leverage = 2
+
+    # Stop-loss and take-profit
+    stop_loss = entry_price * (0.98 if bullish else 1.02)   # 2% away
+    take_profit = entry_price * (1.05 if bullish else 0.95) # 5% away
+
+    forecast_result = {
+        "trend": "bullish" if bullish else "bearish",
+        "entry": entry_price,
+        "leverage": leverage,
+        "stop_loss": stop_loss,
+        "take_profit": take_profit
+    }
+    print(f"Entry: ${entry_price:.2f}  Leverage: {leverage}x")
+    print(f"Stop-loss: ${stop_loss:.2f}   Take-profit: ${take_profit:.2f}")
+    return forecast_result """ ;
+            rdfs:comment "This function is using to predict the stock entry price that will maximizes potential profit for next week." .
+
+
+ys:profitable_day_to_sell_in_upcoming_week rdf:type owl:NamedIndividual ,
+                ys:PredictStockSellingPrice ;
+                ys:canBeComputedUsingFunction ys:predict_stock_selling_price_function .
+
+ys:profitable_day_to_sell_in_upcoming_week rdf:type owl:NamedIndividual ,
+                ys:Function ;
+                ys:applicableToDataObject ys:stock_price_record ;
+                rdfs:label "predict profitable day and stock price to sell that will maximizes potential profit for next week." ;
+                ys:functionRequiresMeasurements ys:stock_symbol ,
+                                    ys:years_back,
+                                    ys:start_date ,
+                                    ys:end_date ;
+                ys:functionDefinition """
+Imports:
+    import pandas as pd
+    import numpy as np
+    from prophet import Prophet
+    from typing import Dict, Any
+    import yfinance as yf
+    from datetime import date
+
+Parameters:
+    df (pandas.DataFrame): DataFrame containing at least 'date','open','high','low','close' and 'volume' columns.
+
+Returns:
+    dict: forecast_result
+    df (pandas.DataFrame): DataFrame containing at next week forecast with 'ds','yhat', 'yhat_lower', 'yhat_upper' columns.
+
+Function Body:    
+    ## -- helper functions ---
+    def download_stock_price_data(stock_symbol, back_period="5y", start_date=None, end_date=None, data_filename=None):
+        """
+        Download Yahoo Finance stock historical price data and export to CSV
+        Parameters:
+        ticker (str): Stock symbol (e.g., 'AAPL', 'GOOGL')
+        start_date (str): Start date in 'YYYY-MM-DD' format
+        end_date (str): End date in 'YYYY-MM-DD' format
+        filename (str): Output filename (optional)
+        """
+        # Create ticker object
+        stock = yf.Ticker(stock_symbol)
+        
+        # Download historical data
+        if start_date and end_date:
+            data = stock.history(start=start_date, end=end_date)
+        else:
+            # Download last 5 years of data by default
+            data = stock.history(period=back_period)
+        
+        # Reset index to make Date a column
+        data = data.reset_index()    
+        # Reorder columns to match your required format
+        columns_order = ['Date', 'Open', 'High', 'Low', 'Close', 'Adj Close', 'Volume']
+        
+        # Ensure all required columns exist
+        for col in columns_order:
+            if col not in data.columns:
+                if col == 'Date':
+                    # Date should be in the index, so we'll use it as is
+                    pass
+                else:
+                    data[col] = 0  # Add missing columns with default values
+        
+        # Select and reorder columns
+        data = data[columns_order]
+        # Format date to YYYY-MM-DD
+        data['Date'] = pd.to_datetime(data['Date']).dt.strftime('%Y-%m-%d')
+        # Update Adjusted Close 
+        data["Adj Close"]=data["Open"]-data["Close"]    
+        # If no filename provided, use ticker name
+        if data_filename is None:
+            data_filename = f"{stock_symbol}_historical_price.csv"
+        # Export to CSV
+        data.to_csv(data_filename, index=False)
+        print(f"Data exported successfully to {data_filename}")
+        print(f"Total records: {len(data)}")
+        print("First few rows:")
+        print(data.tail())
+        return data
+    
+    def prepare_data(df):
+        """
+        Prepares the DataFrame for analysis by ensuring 'Date' is a datetime index
+        and updating the 'Adj Close' column.
+        """
+        # Check if 'Date' column exists, if not, create a dummy date index
+        if 'Date' in df.columns:
+            df['Date'] = pd.to_datetime(df['Date'])
+            df = df.set_index('Date').sort_index()
+        else:
+            print("Warning: 'Date' column not found. Creating a dummy date index for analysis.")
+            df['Date'] = pd.to_datetime(pd.date_range(start='2023-01-01', periods=len(df), freq='D'))
+            df = df.set_index('Date').sort_index()    
+        # Update Adjusted Close. Note: The original formula df["Open"]-df["Close"] is unusual for Adj Close.
+        # For this task, 'Close' price is the primary focus for forecasting.
+        df["Adj Close"]=df["Open"]-df["Close"]    
+        return df    
+    
+    def predict_best_day_to_sell_function(df: pd.DataFrame) -> tuple[Dict[str, Any], pd.DataFrame]:
+        """
+        This function is used to predict the best day and stock price to sell that will maximize
+        potential profit for the next week. It uses the Prophet model for forecasting.
+    
+        Parameters:
+            df (pandas.DataFrame): DataFrame containing at least 'Date', 'Open', 'High', 'Low', 'Close' and 'Volume' columns.
+    
+        Returns:
+            tuple: (forecast_result, next_week_forecast_df)
+                forecast_result (dict): Dictionary containing trend, entry, leverage, stop_loss, take_profit.
+                next_week_forecast_df (pandas.DataFrame): DataFrame with the next 7 days forecast,
+                                                          including 'ds' (date) and 'yhat' (predicted close).
+        """    
+        # ===========================================================================================
+        # Build a forecasting model
+        # ===========================================================================================
+        ## Prophet expects columns 'ds' (date) and 'y' (value)
+        df_prophet = df[['Close']].reset_index().rename(columns={'Date':'ds', 'Close':'y'})
+        m = Prophet(weekly_seasonality=True, daily_seasonality=False)
+        m.fit(df_prophet)
+    
+        future = m.make_future_dataframe(periods=7)   # 7 days ahead
+        forecast = m.predict(future)
+    
+        # Extract the last 7 rows (next week)
+        next_week = forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']].tail(7)
+        print("Next week's forecast:")
+        print(next_week)
+        # ===========================================================================================
+        # Entry logic (as provided in the helper function definition)
+        # ===========================================================================================
+        # Simple trend check
+        short_ma = df['Close'].rolling(window=5).mean().iloc[-1]
+        long_ma  = df['Close'].rolling(window=20).mean().iloc[-1]
+        bullish  = short_ma > long_ma
+    
+        # Predict next week's high/low/close from the forecast
+        predicted_high = next_week['yhat_upper'].max()
+        predicted_low  = next_week['yhat_lower'].min()
+        predicted_close = next_week['yhat'].iloc[-1]
+    
+        # Entry
+        entry_price = df['Close'].iloc[-1] * (1.005 if bullish else 1.0)
+    
+        # Leverage
+        leverage = 2
+    
+        # Stop-loss and take-profit
+        stop_loss = entry_price * (0.98 if bullish else 1.02)   # 2% away
+        take_profit = entry_price * (1.05 if bullish else 0.95) # 5% away
+    
+        forecast_result = {
+            "trend": "bullish" if bullish else "bearish",
+            "entry": entry_price,
+            "leverage": leverage,
+            "stop_loss": stop_loss,
+            "take_profit": take_profit
+        }
+        print(f"Entry: ${entry_price:.2f}  Leverage: {leverage}x")
+        print(f"Stop-loss: ${stop_loss:.2f}   Take-profit: ${take_profit:.2f}")
+    
+        # Modified to return next_week for the task's objective
+        return forecast_result, next_week
+
+
+    def profitable_day_to_sell_in_upcoming_week(stock_symbol,input_df=None,plot_result=True,save_result=True,
+                               back_period="5y",start_date=None, end_date=None, data_filename=None):
+        # 0. validate stock symbol parameters
+        if stock_symbol is None:
+            raise Exception ("missing stock symbol parameter")
+    
+        # 0. download latest data
+        if input_df is None:
+            df = download_stock_price_data(stock_symbol, back_period=back_period,start_date=start_date, end_date=end_date, data_filename=data_filename)
+    
+        if df is None:
+            raise Exception (f"missing {stock_symbol} stock price historical data parameter")
+    
+        # 1. Data Preparation
+        df_prepared=prepare_data(df.copy())
+    
+        # 2. Perform predictive analysis using the modified predict_best_day_to_sell_function
+        forecast_results, next_week_forecast = predict_best_day_to_sell_function(df_prepared)
+        
+        # 3. Identify the most profitable day to sell in the upcoming week
+        # The most profitable day to sell would be the day with the highest predicted closing price (yhat).
+        best_sell_day = next_week_forecast.loc[next_week_forecast['yhat'].idxmax()]
+        
+        # 4. Present the results
+        print("\n--- Predictive Analysis for RR Stock ---")
+        print("\nForecasted Trading Insights:")
+        for key, value in forecast_results.items():
+            if isinstance(value, (float, np.float64)):
+                print(f"{key.replace('_', ' ').title()}: ${value:.2f}")
+            else:
+                print(f"{key.replace('_', ' ').title()}: {value}")
+    
+        ds=f"{best_sell_day['ds'].strftime('%Y-%m-%d')}"
+        yhat=f"${best_sell_day['yhat']:.2f}"
+        yhat_lower=f"${best_sell_day['yhat_lower']:.2f}"
+        yhat_upper=f"${best_sell_day['yhat_upper']:.2f}"
+        print(f"\n--- Most Profitable Day to Sell in the Upcoming Week ---")
+        print(f"Date: {ds}")
+        print(f"Predicted Selling Price (yhat): ${yhat}")
+        print(f"Predicted Lower Bound (yhat_lower): ${yhat_lower}")
+        print(f"Predicted Upper Bound (yhat_upper): ${yhat_upper}")
+    
+        analysis_result={
+            "Forecasted Trading Insights": forecast_results,
+            "Most Profitable Day to Sell in the Upcoming Week":f"{ds}",
+            "Predicted Selling Price (yhat)":f"${yhat}",
+            "Predicted Lower Bound (yhat_lower)":f"${yhat_lower}",
+            "Predicted Upper Bound (yhat_upper)":f"${yhat_upper}"
+        }
+        return analysis_result,next_week_forecast
+
+    analysis_result,next_week_forecast = profitable_day_to_sell_in_upcoming_week(stock_symbol)
+
+    return analysis_result,next_week_forecast """ ;
+            rdfs:comment "This function is using to predict profitable day and stock price to sell that will maximizes potential profit for next week." .
+
+
+ys:backtesting rdf:type owl:NamedIndividual ,
+                ys:BacktestingSMACrossoverStrategy ;
+                ys:canBeComputedUsingFunction ys:backtesting_sma_crossover_function .
+
+ys:backtesting_sma_crossover_function rdf:type owl:NamedIndividual ,
+                ys:Function ;
+                ys:applicableToDataObject ys:stock_price_record ;    
+    rdfs:label "backtesting 50-/200-day SMA crossover strategy." ;
+    ys:functionRequiresMeasurements ys:stock_symbol, 
+                                  ys:date ,
+                                  ys:open ,
+                                  ys:high ,
+                                  ys:low ,
+                                  ys:volume,
+                                  ys:close ;
+    ys:functionDefinition """
+
+Imports:
+    import pandas as pd
+    from backtesting import Strategy
+    from backtesting.lib import crossover
+    from backtesting import Backtest
+    import warnings
+
+Parameters:
+    df (pandas.DataFrame): DataFrame containing at least 'date' and 'close'  columns.
+
+Returns:
+    dict: optimized_stats
+
+Function Body:    
+    # implement the classic 50-/200-day SMA crossover
+    class SMACrossover(Strategy):
+        # look-back periods for the short and long SMAs
+        short_window = 50
+        long_window  = 200
+
+        def init(self):
+            # compute the SMAs once per bar
+            self.short_sma = self.I(pd.Series.rolling, self.data.Close, self.short_window).mean()
+            self.long_sma  = self.I(pd.Series.rolling, self.data.Close, self.long_window).mean()
+
+        def next(self):
+            # if the short SMA crosses above the long SMA -> buy
+            if crossover(self.short_sma, self.long_sma):
+                self.position.close()          # close any short position
+                if not self.position:          # only go long if not already long
+                    self.buy()
+            # if the short SMA crosses below the long SMA -> sell
+            elif crossover(self.long_sma, self.short_sma):
+                self.position.close()          # close any long position
+                if not self.position:          # only go short if not already short
+                    self.sell()
+
+    # Run the backtest
+    # Helper function definition as provided in the data model
+    def backtesting_moving_average_crossover(df):
+        # Ensure 'Date' is datetime and set as index for the backtesting library
+        # The backtesting library expects a DatetimeIndex and specific column names.
+        df_processed = df.copy()
+        df_processed['Date'] = pd.to_datetime(df_processed['Date'])
+        df_processed = df_processed.set_index('Date')
+
+        # The backtesting library expects columns named 'Open', 'High', 'Low', 'Close', 'Volume'.
+        # Our DataFrame already has these names, so no renaming is explicitly needed.
+
+        # Initialize the Backtest object with the globally defined SMACrossover strategy
+        bt_opt = Backtest(
+            df_processed,           # Historical data
+            SMACrossover,           # Strategy class to be backtested (now globally accessible)
+            cash=100_000,           # Starting capital for the backtest
+            commission=.002,        # 0.2% commission per trade
+            trade_on_close=True     # Execute trades at the close of the bar
+        )
+
+        # Optimize for 'short_window' and 'long_window' parameters
+        # The optimization aims to maximize the Sharpe Ratio.
+        # not allowed     # This is the part that uses multiprocessing and requires the __name__ == "__main__" guard.
+        stats_opt = bt_opt.optimize(
+            short_window=[20, 30, 50, 100],  # Range of values to test for short_window
+            long_window=[100, 150, 200, 250], # Range of values to test for long_window
+            max_bars_back=300,               # Maximum bars to look back for SMA calculation
+            maximize='Sharpe Ratio'          # Performance metric to maximize
+        )
+
+        # Generate and display the backtest performance plot
+        # The backtesting library uses Bokeh for plotting by default, which opens in a browser.
+        print(stats_opt)
+        #bt_opt.plot(resample=False)
+        return stats_opt
+
+    # 1. Perform backtesting and optimization using the defined helper function.
+    print("Starting backtesting and parameter optimization...")
+    optimized_stats = backtesting_moving_average_crossover(df)
+
+    # 2. Extract and display the best parameters and performance metrics.
+    print("\n--- Optimized Backtesting Results ---")
+    print(optimized_stats)
+
+    print("\n--- Best Strategy Parameters ---")
+    # Access the best parameters from the '_strategy' attribute of the optimized stats
+    print(f"Best Short Window: {optimized_stats['_strategy'].short_window}")
+    print(f"Best Long Window: {optimized_stats['_strategy'].long_window}")
+
+    print("\n--- Key Performance Metrics ---")
+    print(f"Sharpe Ratio: {optimized_stats['Sharpe Ratio']:.4f}")
+    print(f"Total Return (%): {optimized_stats['Return (Ann.) %']:.2f}%")
+    print(f"Max Drawdown (%): {optimized_stats['Max. Drawdown %']:.2f}%")
+    print(f"Number of Trades: {optimized_stats['# Trades']}")
+
+    return optimized_stats """ ;
+            rdfs:comment "This function is used backtesting with optimized 50-/200-day SMA crossover strategy." .
+
+
+ys:fetch_stock_price_data rdf:type owl:NamedIndividual ,
+                ys:FetchStockPriceHistoricalData ;
+                ys:canBeComputedUsingFunction ys:fetch_stock_price_historical_data_function .
+
+ys:fetch_stock_price_historical_data_function rdf:type owl:NamedIndividual ,
+                                     ys:Function ;
+    ys:applicableToDataObject ys:stock_price_record ;    
+    rdfs:label "download stock historical price data for a specific number of years back or specific start and end dates." ;
+    ys:functionRequiresMeasurements ys:stock_symbol ,
+                                    ys:years_back,
+                                    ys:start_date ,
+                                    ys:end_date ;
+    ys:functionDefinition """
+
+Imports:
+    import yfinance as yf
+    import pandas as pd
+    from datetime import date 
+
+Parameters:
+    stock_symbol (str): Stock symbol (e.g., 'AAPL', 'GOOGL')
+    start_date (str): Start date in 'YYYY-MM-DD' format
+    end_date (str): End date in 'YYYY-MM-DD' format
+    years_back (str): Number of years to go back (e.g., '5y')
+    filename (str): Output filename (optional)
+
+Returns:
+    df (pandas.DataFrame): DataFrame containing at least 'date', 'open', 'high', 'low', 'close', 'adj close', and 'volume' columns.
+
+Function Body:    
+    # Default parameters
+    start_str="2010-01-01"
+    start_date=None
+    end_date=None
+    years_back=None
+    filename=None    
+    end_str = date.today().strftime("%Y-%m-%d") # Format as YYYY-MM-DD
+    if years_back is None:
+        years_back="5y"
+    if stock_symbol is None:
+        return "Missing stock symbol!"
+    print(f"Downloading {stock_symbol} data from {start_str} to {end_str}")
+
+    # Create ticker object
+    stock = yf.Ticker(stock_symbol)
+
+    # Download historical data
+    if start_date and end_date:
+        data = stock.history(start=start_str, end=end_str)
+    else:
+        # Download last 5 years of data by default
+        data = stock.history(period=years_back)
+
+    # Reset index to make Date a column
+    data = data.reset_index()    
+    # Reorder columns to match your required format
+    columns_order = ['Date', 'Open', 'High', 'Low', 'Close', 'Adj Close', 'Volume']
+
+    # Ensure all required columns exist
+    for col in columns_order:
+        if col not in data.columns:
+            if col == 'Date':
+                # Date should be in the index, so we'll use it as is
+                pass
+            else:
+                data[col] = 0  # Add missing columns with default values
+
+    # Select and reorder columns
+    data = data[columns_order]
+    # Format date to YYYY-MM-DD
+    data['Date'] = pd.to_datetime(data['Date']).dt.strftime('%Y-%m-%d')
+
+    # If no filename provided, use stock symbol name
+    if filename is None:
+        filename = f"{stock_symbol}_historical_data.csv"
+
+    # Export to CSV
+    data.to_csv(filename, index=False)
+
+    print(f"Data exported successfully to {filename}")
+    print(f"Total records: {len(data)}")
+    print("First few rows:")
+    print(data.head())
+
+    return df""" ;
+            rdfs:comment "This function is used to download stock historical price data for a specific number of years back or specific start date and end date." .
+
+
+StockPriceAnalysisWithTechnicalIndicator
+ys:stock_price_analysis_with_technical_indicator rdf:type owl:NamedIndividual ,
+                ys:StockPriceAnalysisWithTechnicalIndicator ;
+                ys:canBeComputedUsingFunction ys:stock_price_analysis_with_best_technical_indicator_function .
+
+ys:stock_price_analysis_with_best_technical_indicator_function rdf:type owl:NamedIndividual ,
+                                     ys:Function ;
+    ys:applicableToDataObject ys:stock_price_record ;    
+    rdfs:label "perform a comprehensive stock price analysis with best technical indicators." ;
+    ys:functionRequiresMeasurements ys:stock_symbol ,
+                                    ys:years_back,
+                                    ys:start_date ,
+                                    ys:end_date ;
+    ys:functionDefinition """
+
+Imports:
+    import yfinance as yf
+    import pandas as pd
+    import numpy as np
+    from datetime import date
+    import json
+    import plotly.graph_objects as go
+    from plotly.subplots import make_subplots
+
+Parameters:
+    stock_symbol (str): Stock symbol (e.g., 'AAPL', 'GOOGL')
+    start_date (str): Start date in 'YYYY-MM-DD' format
+    end_date (str): End date in 'YYYY-MM-DD' format
+    years_back (str): Number of years to go back (e.g., '5y')
+    data_filename (str): Output filename (optional)
+
+Returns:
+    analysis_result (Dict): DataFrame containing at least 'date', 'open', 'high', 'low', 'close', 'adj close', and 'volume' columns.
+
+Function Body:    
+    ## -- helper functions ---
+    def download_stock_price_data(stock_symbol, back_period="5y", start_date=None, end_date=None, data_filename=None):
+        """
+        Download Yahoo Finance stock historical price data and export to CSV
+    
+        Parameters:
+        ticker (str): Stock symbol (e.g., 'AAPL', 'GOOGL')
+        start_date (str): Start date in 'YYYY-MM-DD' format
+        end_date (str): End date in 'YYYY-MM-DD' format
+        filename (str): Output filename (optional)
+        """
+        # Create ticker object
+        stock = yf.Ticker(stock_symbol)
+        
+        # Download historical data
+        if start_date and end_date:
+            data = stock.history(start=start_date, end=end_date)
+        else:
+            # Download last 5 years of data by default
+            data = stock.history(period=back_period)
+        
+        # Reset index to make Date a column
+        data = data.reset_index()    
+        # Reorder columns to match your required format
+        columns_order = ['Date', 'Open', 'High', 'Low', 'Close', 'Adj Close', 'Volume']
+        
+        # Ensure all required columns exist
+        for col in columns_order:
+            if col not in data.columns:
+                if col == 'Date':
+                    # Date should be in the index, so we'll use it as is
+                    pass
+                else:
+                    data[col] = 0  # Add missing columns with default values
+        
+        # Select and reorder columns
+        data = data[columns_order]
+        # Format date to YYYY-MM-DD
+        data['Date'] = pd.to_datetime(data['Date']).dt.strftime('%Y-%m-%d')
+        # Update Adjusted Close 
+        data["Adj Close"]=data["Open"]-data["Close"]    
+        # If no filename provided, use ticker name
+        if data_filename is None:
+            data_filename = f"{stock_symbol}_historical_price_by_date.csv"
+        # Export to CSV
+        data.to_csv(data_filename, index=False)
+        print(f"Data exported successfully to {data_filename}")
+        print(f"Total records: {len(data)}")
+        print("First few rows:")
+        print(data.tail())
+        return data
+    
+    def prepare_data(df):
+        # Ensure 'Date' is a datetime object and set as index
+        df['Date'] = pd.to_datetime(df['Date'])
+        df = df.set_index('Date')
+        df = df.sort_index()
+        # Update Adjusted Close 
+        df["Adj Close"]=df["Open"]-df["Close"]    
+        return df
+        
+    def calculate_rsi(data, window=14):
+        """
+        Calculates the Relative Strength Index (RSI).
+        """
+        delta = data.diff()
+        gain = delta.where(delta > 0, 0)
+        loss = -delta.where(delta < 0, 0)
+    
+        avg_gain = gain.ewm(com=window - 1, adjust=False).mean()
+        avg_loss = loss.ewm(com=window - 1, adjust=False).mean()
+    
+        rs = avg_gain / avg_loss
+        rsi = 100 - (100 / (1 + rs))
+        return rsi
+    
+    def detect_simplified_head_and_shoulders(df_close, window=20, peak_prominence=0.05):
+        """
+        A highly simplified heuristic to suggest a potential 'head and shoulders' top reversal.
+        This function looks for a significant peak followed by a decline, which is a characteristic
+        of the 'head' in a bearish H&S pattern. It does not perform full pattern recognition.
+        Returns a Series with -1 for a potential sell signal, 0 otherwise.
+        """
+        signals = pd.Series(0, index=df_close.index)
+    
+        # Find local maxima (peaks)
+        # A simple way to find peaks is to compare a point with its neighbors.
+        # For a more robust peak detection, one might use scipy.signal.find_peaks,
+        # but we are limited to basic pandas/numpy here.
+        # Let's look for a significant drop after a high point.
+        # This is a very rough approximation of a bearish reversal.
+    
+        # Calculate rolling max to identify potential peaks
+        rolling_max = df_close.rolling(window=window, center=True).max()
+    
+        # Identify points where the current close is a local maximum within the window
+        is_peak = (df_close == rolling_max)
+    
+        # Look for a significant drop after a peak
+        for i in range(window, len(df_close) - window):
+            if is_peak.iloc[i]:
+                # Check if there's a significant drop after this peak
+                # A drop of 'peak_prominence' percentage from the peak value
+                peak_value = df_close.iloc[i]
+                future_min_in_window = df_close.iloc[i+1 : i+window+1].min()
+    
+                if future_min_in_window < peak_value * (1 - peak_prominence):
+                    # This suggests a significant peak followed by a decline,
+                    # which could be part of a bearish reversal pattern like H&S.
+                    signals.iloc[i] = -1 # Potential sell signal
+    
+        return signals
+    
+    
+    def visualize_result(df):
+        fig = make_subplots(rows=4, cols=1, shared_xaxes=True,
+                            vertical_spacing=0.05,
+                            row_heights=[0.5, 0.15, 0.15, 0.15])
+        
+        # Candlestick chart with Moving Averages
+        fig.add_trace(go.Candlestick(x=df.index,
+                                     open=df['Open'],
+                                     high=df['High'],
+                                     low=df['Low'],
+                                     close=df['Close'],
+                                     name='Candlestick'), row=1, col=1)
+        fig.add_trace(go.Scatter(x=df.index, y=df['SMA_5'], line=dict(color='blue', width=1), name='SMA 5'), row=1, col=1)
+        fig.add_trace(go.Scatter(x=df.index, y=df['SMA_20'], line=dict(color='red', width=1), name='SMA 20'), row=1, col=1)
+        
+        # Volume chart
+        fig.add_trace(go.Bar(x=df.index, y=df['Volume'], name='Volume', marker_color='lightgray'), row=2, col=1)
+        
+        # RSI chart
+        fig.add_trace(go.Scatter(x=df.index, y=df['RSI'], line=dict(color='purple', width=1), name='RSI'), row=3, col=1)
+        fig.add_trace(go.Scatter(x=df.index, y=[70]*len(df), line=dict(color='red', width=0.5, dash='dash'), name='Overbought (70)'), row=3, col=1)
+        fig.add_trace(go.Scatter(x=df.index, y=[30]*len(df), line=dict(color='green', width=0.5, dash='dash'), name='Oversold (30)'), row=3, col=1)
+        
+        # Daily Change Percentage
+        fig.add_trace(go.Scatter(x=df.index, y=df['Daily_Change_Pct'], line=dict(color='orange', width=1), name='Daily Change %'), row=4, col=1)
+        
+        fig.update_layout(
+            title_text='Stock Price Analysis with Technical Indicators',
+            xaxis_rangeslider_visible=False,
+            height=900,
+            template='plotly_white',
+            hovermode='x unified'
+        )
+        fig.update_yaxes(title_text='Price', row=1, col=1)
+        fig.update_yaxes(title_text='Volume', row=2, col=1)
+        fig.update_yaxes(title_text='RSI', row=3, col=1)
+        fig.update_yaxes(title_text='Daily Change %', row=4, col=1)
+        fig.show()
+    
+    
+    def technical_analysis_with_technical_indicator(stock_symbol,df=None,plot_result=True,save_result=True,back_period="5y",start_date=None, end_date=None, data_filename=None):
+        # 0. validate stock symbol parameters
+        if stock_symbol is None:
+            raise Exception ("missing stock symbol parameter")
+    
+        # 1. download latest data
+        if df is None:
+            df = download_stock_price_data(stock_symbol, back_period=back_period,start_date=start_date, end_date=end_date, data_filename=data_filename)
+    
+        if df is None:
+            raise Exception (f"missing {stock_symbol} stock price historical data parameter")
+    
+        # 2.--- parepare data for analysis ---
+        df=prepare_data(df)
+    
+        # 3. Price Changes and Trading Volume
+        df['Daily_Change'] = df['Close'] - df['Open']
+        df['Daily_Change_Pct'] = (df['Daily_Change'] / df['Open']) * 100
+        
+        # 4. Technical Indicators
+        # Moving Averages
+        df['SMA_5'] = df['Close'].rolling(window=5).mean()
+        df['SMA_20'] = df['Close'].rolling(window=20).mean()
+        
+        # RSI
+        df['RSI'] = calculate_rsi(df['Close'], window=14)
+        
+        # 5. Chart Formations - Simplified Head and Shoulders
+        df['H&S_Signal'] = detect_simplified_head_and_shoulders(df['Close'], window=20, peak_prominence=0.05)
+        
+        # --- Trading Signal Generation ---
+        
+        # Initialize Signal column
+        df['Signal'] = 'Hold'
+        
+        # MA Crossover Signals
+        # Golden Cross (Buy): SMA_5 crosses above SMA_20
+        df.loc[(df['SMA_5'].shift(1) < df['SMA_20'].shift(1)) & (df['SMA_5'] > df['SMA_20']), 'Signal'] = 'Buy'
+        # Death Cross (Sell): SMA_5 crosses below SMA_20
+        df.loc[(df['SMA_5'].shift(1) > df['SMA_20'].shift(1)) & (df['SMA_5'] < df['SMA_20']), 'Signal'] = 'Sell'
+        
+        # RSI Signals
+        # Buy: RSI moves from oversold (<30) to above 30
+        df.loc[(df['RSI'].shift(1) < 30) & (df['RSI'] >= 30), 'Signal'] = 'Buy'
+        # Sell: RSI moves from overbought (>70) to below 70
+        df.loc[(df['RSI'].shift(1) > 70) & (df['RSI'] <= 70), 'Signal'] = 'Sell'
+        
+        # Incorporate simplified H&S signal (if detected, it's a strong sell indication)
+        df.loc[df['H&S_Signal'] == -1, 'Signal'] = 'Sell'
+        
+        # For the final recommendation, consider the most recent signal
+        last_signal = df['Signal'].iloc[-1]
+        last_close = df['Close'].iloc[-1]
+        last_sma_5 = df['SMA_5'].iloc[-1]
+        last_sma_20 = df['SMA_20'].iloc[-1]
+        last_rsi = df['RSI'].iloc[-1]
+        last_daily_change_pct = df['Daily_Change_Pct'].iloc[-1]
+    
+        # 6.--- Final Output Generation ---
+        market_direction = "Neutral"
+        if last_signal == 'Buy':
+            market_direction = "Bullish"
+        elif last_signal == 'Sell':
+            market_direction = "Bearish"
+        
+        analysis_date = f"{df.index[-1].strftime('%Y-%m-%d')}"
+        
+        print("\n--- Comprehensive Stock Analytics Model Output ---")
+        print(f"Analysis Date: {analysis_date}")
+        print(f"Last Closing Price: {last_close:.2f}")
+        print(f"Last Daily Change Percentage: {last_daily_change_pct:.2f}%")
+        print(f"Last 5-day SMA: {last_sma_5:.2f}")
+        print(f"Last 20-day SMA: {last_sma_20:.2f}")
+        print(f"Last RSI (14-period): {last_rsi:.2f}")
+        
+        print("\n--- Market Direction Prediction ---")
+        print(f"Based on the latest indicators, the predicted market direction for the upcoming week is: ***{market_direction}***.")
+        
+        print("\n--- Actionable Trading Recommendation ---")
+        if last_signal == 'Buy':
+            recommendation="Recommendation: ***BUY***. The short-term moving average has crossed above the long-term moving average, and/or RSI indicates a move out of oversold territory, suggesting upward momentum."
+        elif last_signal == 'Sell':
+            recommendation="Recommendation: ***SELL***. The short-term moving average has crossed below the long-term moving average, and/or RSI indicates a move out of overbought territory, or a potential bearish reversal pattern (simplified H&S) was suggested, indicating downward pressure."
+        else:
+            recommendation="Recommendation: ***HOLD***. The market shows no clear strong buy or sell signals based on the current analysis. It's advisable to wait for clearer trends or signals."
+        print(recommendation)
+        
+        print("\n--- Key Insights ---")
+        if last_sma_5 > last_sma_20:
+            short_term_trend_sma_20="• The short-term trend (SMA_5) is currently above the long-term trend (SMA_20), indicating a generally ***positive momentum***."
+        else:
+            short_term_trend_sma_20="• The short-term trend (SMA_5) is currently below the long-term trend (SMA_20), indicating a generally ***negative momentum***."
+        print(short_term_trend_sma_20)
+        
+        if last_rsi > 70:
+            rsi=f"• RSI ({last_rsi:.2f}) is in ***overbought territory***, suggesting the stock might be due for a pullback."
+        elif last_rsi < 30:
+            rsi=f"• RSI ({last_rsi:.2f}) is in ***oversold territory***, suggesting the stock might be due for a rebound."
+        else:
+            rsi=f"• RSI ({last_rsi:.2f}) is in ***neutral territory***, indicating no immediate overbought or oversold conditions."
+        print(rsi)
+        
+        head_and_shoulders_signal=""
+        if df['H&S_Signal'].iloc[-1] == -1:
+            head_and_shoulders_signal="• A simplified 'Head and Shoulders' pattern (bearish reversal) was recently suggested, contributing to a potential sell signal."
+        elif df['H&S_Signal'].iloc[-2] == -1: # Check previous day if current is not a signal
+            head_and_shoulders_signal="• A simplified 'Head and Shoulders' pattern (bearish reversal) was recently suggested, contributing to a potential sell signal."
+        print(head_and_shoulders_signal)
+        
+        daily_change=f"• The stock closed with a daily change of {last_daily_change_pct:.2f}%."
+    
+        # 7.--- prepare output ---    
+        analysis_result={
+            "comprehensive_stock_analytics": {
+                "analysis_date": f"{analysis_date}",
+                "last_closing_price": f"{last_close:.2f}",
+                "last_daily_change_percentage": f"{last_daily_change_pct:.2f}%",
+                "last_5_day_sma":f"{last_sma_5:.2f}",
+                "last_20_day_sma":f"{last_sma_20:.2f}",
+                "last_rsi_14_period":f"{last_rsi:.2f}",
+                "last_signal":f"{last_signal}",            
+            },
+            "market_direction_prediction":f"{market_direction}",
+            "trading_recommendation_signal":f"{recommendation}",
+            "key_insights":{
+                "short_term_trend_sma_5":f"{short_term_trend_sma_20}",
+                "rsi":f"{rsi}",
+                "head_and_shoulders_signal":f"{head_and_shoulders_signal}",
+                "daily_change":f"{daily_change}"
+            }
+        }
+        print(analysis_result)
+        print(df.tail())
+        # 8.--- Visualizations ---    
+        if plot_result:
+            visualize_result(df)    
+        if save_result:
+            # Save result to json file
+            filename = f"{stock_symbol}_analysis_result.json"
+            # Open the file in write mode ("w") with UTF-8 encoding for broader character support
+            with open(filename, mode="w",encoding="utf-8") as f:
+                json.dump(analysis_result, f, indent=2)
+            print(f"Data successfully saved to {filename}")
+    
+        final_report_md=f"""
+        
+        #### Comprehensive Stock Price Analysis with Technical Indicator   
+        | Metric | Value |
+        | :--- | :--- |
+        |Analysis Date:| {analysis_result["comprehensive_stock_analytics"]["analysis_date"]}
+        |Last Closing Price:| {analysis_result["comprehensive_stock_analytics"]["last_closing_price"]}
+        |Last Daily Change Percentage:| {analysis_result["comprehensive_stock_analytics"]["last_daily_change_percentage"]}
+        |Last 5-day SMA:| {analysis_result["comprehensive_stock_analytics"]["last_5_day_sma"]}
+        |Last 20-day SMA:| {analysis_result["comprehensive_stock_analytics"]["last_20_day_sma"]}
+        |Last RSI (14-period):| {analysis_result["comprehensive_stock_analytics"]["last_rsi_14_period"]}
+        
+        #### Market Direction Prediction
+        Based on the latest indicators, the predicted market direction for the upcoming week is: ***{analysis_result["market_direction_prediction"]}***.
+        
+        #### Actionable Trading Recommendation
+        Recommendation: ***{analysis_result["comprehensive_stock_analytics"]["last_signal"]}***.
+        <br/>The market shows no clear strong buy or sell signals based on the current analysis. It's advisable to wait for clearer trends or signals.
+        
+        #### Key Insights 
+        {analysis_result["key_insights"]["short_term_trend_sma_5"]}. 
+        <br/>{analysis_result["key_insights"]["rsi"]}.
+        <br/>{analysis_result["key_insights"]["daily_change"]}.
+        <br/>{analysis_result["key_insights"]["head_and_shoulders_signal"]}.
+        """
+        return final_report_md
+
+    final_report_md =technical_analysis_with_technical_indicator(stock_symbol,plot_result=True,save_result=True,back_period="5y")
+    return final_report_md""" ;
+            rdfs:comment "This function is used to perform a comprehensive stock price analysis with best technical indicators." .
+
+
+ys:detect_head_and_shoulder_patterns_and_signals rdf:type owl:NamedIndividual ,
+                ys:StockPriceHeadAndShoulderPatternDetection ;
+                ys:canBeComputedUsingFunction ys:detect_head_and_shoulder_patterns_function .
+
+ys:detect_head_and_shoulder_patterns_and_signals_function rdf:type owl:NamedIndividual ,
+                                     ys:Function ;
+    ys:applicableToDataObject ys:stock_price_record ;    
+    rdfs:label "detect Head and Shoulder (H&S) and Inverse Head and Shoulder (IH&S) patterns and neckline and buy/short-sell signals in stock data with robust method." ;
+    ys:functionRequiresMeasurements ys:stock_symbol ,
+                                    ys:years_back,
+                                    ys:start_date ,
+                                    ys:end_date ;
+    ys:functionDefinition """
+
+Imports:
+    import yfinance as yf
+    import pandas as pd
+    import pandas as pd
+    import numpy as np
+    from scipy.signal import find_peaks
+    import plotly.graph_objects as go
+    from datetime import timedelta
+    from datetime import date
+    import json
+    from datetime import datetime
+    import json
+
+Parameters:
+    stock_symbol (str): Stock symbol (e.g., 'AAPL', 'GOOGL')
+    start_date (str): Start date in 'YYYY-MM-DD' format
+    end_date (str): End date in 'YYYY-MM-DD' format
+    years_back (str): Number of years to go back (e.g., '5y')
+    data_filename (str): Output filename (optional)
+
+Returns:
+    analysis_result (Dict): DataFrame containing at least 'date', 'open', 'high', 'low', 'close', 'adj close', and 'volume' columns.
+
+Function Body:    
+    ## -- helper functions ---
+    def download_stock_price_data(stock_symbol, back_period="5y", start_date=None, end_date=None, data_filename=None):
+        """
+        Download Yahoo Finance stock historical price data and export to CSV
+        Parameters:
+        ticker (str): Stock symbol (e.g., 'AAPL', 'GOOGL')
+        start_date (str): Start date in 'YYYY-MM-DD' format
+        end_date (str): End date in 'YYYY-MM-DD' format
+        filename (str): Output filename (optional)
+        """
+        # Create ticker object
+        stock = yf.Ticker(stock_symbol)
+        
+        # Download historical data
+        if start_date and end_date:
+            data = stock.history(start=start_date, end=end_date)
+        else:
+            # Download last 5 years of data by default
+            data = stock.history(period=back_period)
+        
+        # Reset index to make Date a column
+        data = data.reset_index()    
+        # Reorder columns to match your required format
+        columns_order = ['Date', 'Open', 'High', 'Low', 'Close', 'Adj Close', 'Volume']
+        
+        # Ensure all required columns exist
+        for col in columns_order:
+            if col not in data.columns:
+                if col == 'Date':
+                    # Date should be in the index, so we'll use it as is
+                    pass
+                else:
+                    data[col] = 0  # Add missing columns with default values
+        
+        # Select and reorder columns
+        data = data[columns_order]
+        # Format date to YYYY-MM-DD
+        data['Date'] = pd.to_datetime(data['Date']).dt.strftime('%Y-%m-%d')
+        # Update Adjusted Close 
+        data["Adj Close"]=data["Open"]-data["Close"]    
+        # If no filename provided, use ticker name
+        if data_filename is None:
+            data_filename = f"{stock_symbol}_historical_price_by_date.csv"
+        # Export to CSV
+        data.to_csv(data_filename, index=False)
+        print(f"Data exported successfully to {data_filename}")
+        print(f"Total records: {len(data)}")
+        print("First few rows:")
+        print(data.tail())
+        return data
+    
+    def prepare_data(df):
+        # Check if 'Date' column exists, if not, create a dummy date index
+        if 'Date' in df.columns:
+            df['Date'] = pd.to_datetime(df['Date'])
+            df = df.set_index('Date').sort_index()
+        else:
+            print("Warning: 'Date' column not found. Creating a dummy date index for analysis.")
+            df['Date'] = pd.to_datetime(pd.date_range(start='2023-01-01', periods=len(df), freq='D'))
+            df = df.set_index('Date').sort_index()    
+        # Update Adjusted Close 
+        df["Adj Close"]=df["Open"]-df["Close"]    
+        return df    
+
+    # Helper function to detect Head and Shoulders pattern
+    def detect_head_and_shoulders(df, peaks, troughs, window=10):
+        """
+        Detects Head and Shoulders patterns.
+        A H&S pattern consists of three peaks (LS, H, RS) and two troughs (neckline points).
+        LS and RS are lower than H. The neckline is formed by connecting the two troughs.
+        Confirmation occurs when the price breaks below the neckline after the RS.
+        """
+        hs_patterns = []
+        for i in range(len(peaks) - 2):
+            # Potential Head (H)
+            h_idx = peaks[i+1]
+            h_price = df['Close'].iloc[h_idx]
+    
+            # Potential Left Shoulder (LS)
+            ls_idx = peaks[i]
+            ls_price = df['Close'].iloc[ls_idx]
+    
+            # Potential Right Shoulder (RS)
+            rs_idx = peaks[i+2]
+            rs_price = df['Close'].iloc[rs_idx]
+    
+            # Ensure peaks are in correct chronological order
+            if not (ls_idx < h_idx < rs_idx):
+                continue
+    
+            # Check peak order and relative heights
+            # H must be the highest, LS and RS must be lower than H
+            if ls_price < h_price and rs_price < h_price:
+                # Check if LS and RS are roughly similar in height (within 15% of H's height difference from the lower of LS/RS)
+                # This is a heuristic, can be adjusted
+                if abs(ls_price - rs_price) / h_price < 0.15:
+    
+                    # Find troughs between LS-H and H-RS to define the neckline
+                    troughs_between_ls_h = [t for t in troughs if ls_idx < t < h_idx]
+                    troughs_between_h_rs = [t for t in troughs if h_idx < t < rs_idx]
+    
+                    if len(troughs_between_ls_h) >= 1 and len(troughs_between_h_rs) >= 1:
+                        neckline_trough1_idx = troughs_between_ls_h[-1] # Last trough before H
+                        neckline_trough2_idx = troughs_between_h_rs[0]  # First trough after H
+    
+                        # Ensure neckline troughs are also in chronological order
+                        if not (neckline_trough1_idx < neckline_trough2_idx):
+                            continue
+    
+                        neckline_trough1_price = df['Close'].iloc[neckline_trough1_idx]
+                        neckline_trough2_price = df['Close'].iloc[neckline_trough2_idx]
+    
+                        # Define neckline as a line connecting these two troughs
+                        # Slope of the neckline
+                        if neckline_trough2_idx - neckline_trough1_idx != 0:
+                            neckline_slope = (neckline_trough2_price - neckline_trough1_price) / (neckline_trough2_idx - neckline_trough1_idx)
+                        else:
+                            neckline_slope = 0 # Horizontal neckline if indices are the same (shouldn't happen with distinct troughs)
+    
+                        # Check for confirmation: price breaking below neckline after RS
+                        # Look for a close price below the neckline after the right shoulder
+                        confirmation_idx = -1
+                        for k in range(rs_idx + 1, len(df)):
+                            neckline_value_at_k = neckline_trough1_price + neckline_slope * (k - neckline_trough1_idx)
+                            if df['Close'].iloc[k] < neckline_value_at_k:
+                                confirmation_idx = k
+                                break
+    
+                        if confirmation_idx != -1:
+                            hs_patterns.append({
+                                'type': 'H&S',
+                                'ls_idx': ls_idx, 'ls_price': ls_price,
+                                'h_idx': h_idx, 'h_price': h_price,
+                                'rs_idx': rs_idx, 'rs_price': rs_price,
+                                'neckline_trough1_idx': neckline_trough1_idx, 'neckline_trough1_price': neckline_trough1_price,
+                                'neckline_trough2_idx': neckline_trough2_idx, 'neckline_trough2_price': neckline_trough2_price,
+                                'confirmation_idx': confirmation_idx,
+                                'signal_date': df.index[confirmation_idx]
+                            })
+        return hs_patterns
+    
+    # Helper function to detect Inverse Head and Shoulders pattern
+    def detect_inverse_head_and_shoulders(df, peaks, troughs, window=10):
+        """
+        Detects Inverse Head and Shoulders patterns.
+        An IH&S pattern consists of three troughs (LS, H, RS) and two peaks (neckline points).
+        LS and RS are higher than H. The neckline is formed by connecting the two peaks.
+        Confirmation occurs when the price breaks above the neckline after the RS.
+        """
+        ihs_patterns = []
+        for i in range(len(troughs) - 2):
+            # Potential Head (H)
+            h_idx = troughs[i+1]
+            h_price = df['Close'].iloc[h_idx]
+    
+            # Potential Left Shoulder (LS)
+            ls_idx = troughs[i]
+            ls_price = df['Close'].iloc[ls_idx]
+    
+            # Potential Right Shoulder (RS)
+            rs_idx = troughs[i+2]
+            rs_price = df['Close'].iloc[rs_idx]
+    
+            # Ensure troughs are in correct chronological order
+            if not (ls_idx < h_idx < rs_idx):
+                continue
+    
+            # Check trough order and relative depths
+            # H must be the lowest, LS and RS must be higher than H
+            if ls_price > h_price and rs_price > h_price:
+                # Check if LS and RS are roughly similar in depth (within 15% of H's depth difference from the higher of LS/RS)
+                if abs(ls_price - rs_price) / h_price < 0.15:
+    
+                    # Find peaks between LS-H and H-RS to define the neckline
+                    peaks_between_ls_h = [p for p in peaks if ls_idx < p < h_idx]
+                    peaks_between_h_rs = [p for p in peaks if h_idx < p < rs_idx]
+    
+                    if len(peaks_between_ls_h) >= 1 and len(peaks_between_h_rs) >= 1:
+                        neckline_peak1_idx = peaks_between_ls_h[-1] # Last peak before H
+                        neckline_peak2_idx = peaks_between_h_rs[0]  # First peak after H
+    
+                        # Ensure neckline peaks are also in chronological order
+                        if not (neckline_peak1_idx < neckline_peak2_idx):
+                            continue
+    
+                        neckline_peak1_price = df['Close'].iloc[neckline_peak1_idx]
+                        neckline_peak2_price = df['Close'].iloc[neckline_peak2_idx]
+    
+                        # Define neckline as a line connecting these two peaks
+                        # Slope of the neckline
+                        if neckline_peak2_idx - neckline_peak1_idx != 0:
+                            neckline_slope = (neckline_peak2_price - neckline_peak1_price) / (neckline_peak2_idx - neckline_peak1_idx)
+                        else:
+                            neckline_slope = 0 # Horizontal neckline
+    
+                        # Check for confirmation: price breaking above neckline after RS
+                        confirmation_idx = -1
+                        for k in range(rs_idx + 1, len(df)):
+                            neckline_value_at_k = neckline_peak1_price + neckline_slope * (k - neckline_peak1_idx)
+                            if df['Close'].iloc[k] > neckline_value_at_k:
+                                confirmation_idx = k
+                                break
+    
+                        if confirmation_idx != -1:
+                            ihs_patterns.append({
+                                'type': 'IH&S',
+                                'ls_idx': ls_idx, 'ls_price': ls_price,
+                                'h_idx': h_idx, 'h_price': h_price,
+                                'rs_idx': rs_idx, 'rs_price': rs_price,
+                                'neckline_peak1_idx': neckline_peak1_idx, 'neckline_peak1_price': neckline_peak1_price,
+                                'neckline_peak2_idx': neckline_peak2_idx, 'neckline_peak2_price': neckline_peak2_price,
+                                'confirmation_idx': confirmation_idx,
+                                'signal_date': df.index[confirmation_idx]
+                            })
+        return ihs_patterns
+
+    def plotting_patterns_and_signals(df,hs_patterns, ihs_patterns):
+        # 7. Visual Confirmation: Plotting Patterns and Signals
+        """
+        Visual Confirmation: Plotting Head and Shoulder Patterns and Signals
+    
+        Parameters:
+        df (pandas.Dataframe): stock price data 
+        hs_patterns (str): Head and Shoulder Pattern (short-sell signal
+        ihs_patterns (str): Inverse Head and Shoulder Pattern (buy signal)
+        """    
+        fig = go.Figure(data=[go.Candlestick(x=df.index,
+                                             open=df['Open'],
+                                             high=df['High'],
+                                             low=df['Low'],
+                                             close=df['Close'],
+                                             name='Candlestick')])
+        
+        # Add H&S patterns
+        for i, pattern in enumerate(hs_patterns):
+            # Left Shoulder
+            fig.add_trace(go.Scatter(x=[df.index[pattern['ls_idx']]], y=[pattern['ls_price']],
+                                     mode='markers', marker=dict(symbol='triangle-up', size=10, color='red'),
+                                     name=f'H&S LS {i}', showlegend=(i==0))) # Show legend only for the first instance
+            # Head
+            fig.add_trace(go.Scatter(x=[df.index[pattern['h_idx']]], y=[pattern['h_price']],
+                                     mode='markers', marker=dict(symbol='star', size=12, color='red'),
+                                     name=f'H&S Head {i}', showlegend=(i==0)))
+            # Right Shoulder
+            fig.add_trace(go.Scatter(x=[df.index[pattern['rs_idx']]], y=[pattern['rs_price']],
+                                     mode='markers', marker=dict(symbol='triangle-up', size=10, color='red'),
+                                     name=f'H&S RS {i}', showlegend=(i==0)))
+            # Neckline
+            neckline_x = [df.index[pattern['neckline_trough1_idx']], df.index[pattern['neckline_trough2_idx']]]
+            neckline_y = [pattern['neckline_trough1_price'], pattern['neckline_trough2_price']]
+            # Extend neckline for visualization up to the confirmation point
+            if pattern['confirmation_idx'] != -1:
+                neckline_end_x = df.index[pattern['confirmation_idx']]
+                neckline_slope = (pattern['neckline_trough2_price'] - pattern['neckline_trough1_price']) / (pattern['neckline_trough2_idx'] - pattern['neckline_trough1_idx']) if (pattern['neckline_trough2_idx'] - pattern['neckline_trough1_idx']) != 0 else 0
+                neckline_end_y = pattern['neckline_trough1_price'] + neckline_slope * (pattern['confirmation_idx'] - pattern['neckline_trough1_idx'])
+                neckline_x.append(neckline_end_x)
+                neckline_y.append(neckline_end_y)
+        
+            fig.add_trace(go.Scatter(x=neckline_x, y=neckline_y, mode='lines', line=dict(color='purple', dash='dash'),
+                                     name=f'H&S Neckline {i}', showlegend=(i==0)))
+            # Confirmation signal
+            if pattern['confirmation_idx'] != -1:
+                fig.add_trace(go.Scatter(x=[df.index[pattern['confirmation_idx']]], y=[df['Close'].iloc[pattern['confirmation_idx']]],
+                                         mode='markers', marker=dict(symbol='arrow-down', size=15, color='red'),
+                                         name=f'Short-Sell Signal {i}', showlegend=(i==0)))
+        
+        # Add IH&S patterns
+        for i, pattern in enumerate(ihs_patterns):
+            # Left Shoulder
+            fig.add_trace(go.Scatter(x=[df.index[pattern['ls_idx']]], y=[pattern['ls_price']],
+                                     mode='markers', marker=dict(symbol='triangle-down', size=10, color='green'),
+                                     name=f'IH&S LS {i}', showlegend=(i==0)))
+            # Head
+            fig.add_trace(go.Scatter(x=[df.index[pattern['h_idx']]], y=[pattern['h_price']],
+                                     mode='markers', marker=dict(symbol='star', size=12, color='green'),
+                                     name=f'IH&S Head {i}', showlegend=(i==0)))
+            # Right Shoulder
+            fig.add_trace(go.Scatter(x=[df.index[pattern['rs_idx']]], y=[pattern['rs_price']],
+                                     mode='markers', marker=dict(symbol='triangle-down', size=10, color='green'),
+                                     name=f'IH&S RS {i}', showlegend=(i==0)))
+            # Neckline
+            neckline_x = [df.index[pattern['neckline_peak1_idx']], df.index[pattern['neckline_peak2_idx']]]
+            neckline_y = [pattern['neckline_peak1_price'], pattern['neckline_peak2_price']]
+            # Extend neckline for visualization up to the confirmation point
+            if pattern['confirmation_idx'] != -1:
+                neckline_end_x = df.index[pattern['confirmation_idx']]
+                neckline_slope = (pattern['neckline_peak2_price'] - pattern['neckline_peak1_price']) / (pattern['neckline_peak2_idx'] - pattern['neckline_peak1_idx']) if (pattern['neckline_peak2_idx'] - pattern['neckline_peak1_idx']) != 0 else 0
+                neckline_end_y = pattern['neckline_peak1_price'] + neckline_slope * (pattern['confirmation_idx'] - pattern['neckline_peak1_idx'])
+                neckline_x.append(neckline_end_x)
+                neckline_y.append(neckline_end_y)
+        
+            fig.add_trace(go.Scatter(x=neckline_x, y=neckline_y, mode='lines', line=dict(color='blue', dash='dash'),
+                                     name=f'IH&S Neckline {i}', showlegend=(i==0)))
+            # Confirmation signal
+            if pattern['confirmation_idx'] != -1:
+                fig.add_trace(go.Scatter(x=[df.index[pattern['confirmation_idx']]], y=[df['Close'].iloc[pattern['confirmation_idx']]],
+                                         mode='markers', marker=dict(symbol='arrow-up', size=15, color='green'),
+                                         name=f'Buy Signal {i}', showlegend=(i==0)))
+        
+        fig.update_layout(title='Stock Price with Head & Shoulders and Inverse Head & Shoulders Patterns and Signals',
+                          xaxis_title='Date',
+                          yaxis_title='Price',
+                          xaxis_rangeslider_visible=False)
+        fig.show()
+
+
+    # Helper function for trading simulation
+    def simulate_trading(df, signals, initial_capital=2000):
+        capital = initial_capital
+        shares = 0
+        position = 0 # 0: no position, 1: long, -1: short
+        trade_log = []
+    
+        for i in range(len(df)):
+            current_date = df.index[i]
+            current_close = df['Close'].iloc[i]
+            signal = signals.get(current_date)
+    
+            # Close existing position if an opposite signal is received
+            if signal == 'short-sell' and position == 1: # Close long position
+                profit_loss = (current_close - trade_log[-1]['entry_price']) * trade_log[-1]['shares']
+                trade_log[-1]['exit_date'] = current_date
+                trade_log[-1]['exit_price'] = current_close
+                trade_log[-1]['profit_loss'] = profit_loss
+                capital += profit_loss
+                shares = 0
+                position = 0
+    
+            elif signal == 'buy' and position == -1: # Close short position
+                profit_loss = (trade_log[-1]['entry_price'] - current_close) * trade_log[-1]['entry_shares'] # Use entry_shares for short
+                trade_log[-1]['exit_date'] = current_date
+                trade_log[-1]['exit_price'] = current_close
+                trade_log[-1]['profit_loss'] = profit_loss
+                capital += profit_loss
+                shares = 0
+                position = 0
+    
+            # Open new position
+            if signal == 'buy' and position == 0:
+                shares_to_buy = capital / current_close
+                trade_log.append({
+                    'date': current_date,
+                    'type': 'buy',
+                    'entry_price': current_close,
+                    'shares': shares_to_buy, # Shares held
+                    'entry_shares': shares_to_buy, # Shares bought
+                    'exit_date': None,
+                    'exit_price': None,
+                    'profit_loss': None
+                })
+                shares = shares_to_buy
+                position = 1
+                capital = 0 # All capital invested
+    
+            elif signal == 'short-sell' and position == 0:
+                # For short-selling, we typically use the initial capital as a reference for the value of shares to short.
+                # The capital account increases by the value of the shorted shares.
+                shares_to_short = initial_capital / current_close
+                trade_log.append({
+                    'date': current_date,
+                    'type': 'short-sell',
+                    'entry_price': current_close,
+                    'shares': -shares_to_short, # Negative shares to indicate short position
+                    'entry_shares': shares_to_short, # Number of shares shorted
+                    'exit_date': None,
+                    'exit_price': None,
+                    'profit_loss': None
+                })
+                shares = -shares_to_short
+                position = -1
+                capital += initial_capital
+    
+        # Close any open positions at the end of the simulation
+        if position == 1: # Long position
+            profit_loss = (df['Close'].iloc[-1] - trade_log[-1]['entry_price']) * trade_log[-1]['shares']
+            trade_log[-1]['exit_date'] = df.index[-1]
+            trade_log[-1]['exit_price'] = df['Close'].iloc[-1]
+            trade_log[-1]['profit_loss'] = profit_loss
+            capital += profit_loss
+        elif position == -1: # Short position
+            profit_loss = (trade_log[-1]['entry_price'] - df['Close'].iloc[-1]) * trade_log[-1]['entry_shares']
+            trade_log[-1]['exit_date'] = df.index[-1]
+            trade_log[-1]['exit_price'] = df['Close'].iloc[-1]
+            trade_log[-1]['profit_loss'] = profit_loss
+            capital += profit_loss
+    
+        final_portfolio_value = capital
+        total_profit_loss = final_portfolio_value - initial_capital
+        num_trades = len(trade_log)
+        winning_trades = sum(1 for trade in trade_log if trade['profit_loss'] is not None and trade['profit_loss'] > 0)
+        win_rate = (winning_trades / num_trades) * 100 if num_trades > 0 else 0
+    
+        return {
+            'initial_capital': initial_capital,
+            'final_portfolio_value': final_portfolio_value,
+            'total_profit_loss': total_profit_loss,
+            'num_trades': num_trades,
+            'winning_trades': winning_trades,
+            'win_rate': win_rate,
+            'trade_log': trade_log
+        }
+                                                          
+    # pattern detections pipeline
+    def detect_head_and_shoulder_patterns(stock_symbol,input_df=None,plot_result=True,save_result=True,
+                                            enable_simulation=False,initial_investment=2000,
+                                            back_period="5y",
+                                            start_date=None, end_date=None, data_filename=None):
+        # 0. validate stock symbol parameters
+        if stock_symbol is None:
+            raise Exception ("missing stock symbol parameter")
+    
+        # 0. download latest data
+        if input_df is None:
+            df = download_stock_price_data(stock_symbol, back_period=back_period,start_date=start_date, end_date=end_date, data_filename=data_filename)
+    
+        if df is None:
+            raise Exception (f"missing {stock_symbol} stock price historical data parameter")
+    
+        # 1. Data Preparation
+        df=prepare_data(df)
+    
+        # 2. Find Peaks and Troughs
+        # For peaks, we look for local maxima in 'Close' prices
+        # For troughs, we look for local minima in 'Close' prices (or peaks in negative 'Close' prices)
+        # Using a distance parameter to ensure peaks/troughs are sufficiently separated
+        # Adjusting distance based on the data's granularity and expected pattern size
+        peaks, _ = find_peaks(df['Close'], distance=10, prominence=0.05) # Increased distance, added prominence
+        troughs, _ = find_peaks(-df['Close'], distance=10, prominence=0.05) # Increased distance, added prominence
+        
+        # Convert peak/trough indices to be relative to the DataFrame index
+        # Ensure peaks and troughs are within the valid index range
+        peaks = [p for p in peaks if p < len(df)]
+        troughs = [t for t in troughs if t < len(df)]
+        
+        # 3. Detect Head and Shoulders (H&S) and Inverse Head and Shoulders (IH&S)
+        hs_patterns = detect_head_and_shoulders(df, peaks, troughs)
+        ihs_patterns = detect_inverse_head_and_shoulders(df, peaks, troughs)
+        
+        # 4. Generate Trading Signals and Handle Conflicting Signals
+        signals = {}
+        all_patterns = sorted(hs_patterns + ihs_patterns, key=lambda x: x['confirmation_idx'])
+        
+        # Simple conflict resolution: prioritize the latest confirmed signal.
+        # If a signal is confirmed, we assume a position is taken and held until an opposite signal.
+        current_position_type = None # 'long' or 'short'
+        last_signal_date = None
+        
+        for pattern in all_patterns:
+            signal_date = pattern['signal_date']
+            signal_type = 'short-sell' if pattern['type'] == 'H&S' else 'buy'
+        
+            # If there's no current position, or if the new signal is opposite to the current position
+            if current_position_type is None or \
+               (current_position_type == 'long' and signal_type == 'short-sell') or \
+               (current_position_type == 'short' and signal_type == 'buy'):
+                signals[signal_date] = signal_type
+                current_position_type = 'long' if signal_type == 'buy' else 'short'
+                last_signal_date = signal_date
+            # If the new signal is the same as the current position, ignore it (already in position)
+            # This simple logic ensures we only act on a signal that changes our position.
+        print("\n=====================================")
+        print("\n--- Detected Signals ---")    
+        for key, value in signals.items():
+            print(f"{key}: {value}")    
+        print("=====================================")    
+        detection_result={
+            "signals":signals,
+            "hs_patterns":hs_patterns,
+            "ihs_patterns":ihs_patterns,        
+        } 
+        if plot_result:
+            plotting_patterns_and_signals(df,hs_patterns, ihs_patterns)
+        if enable_simulation:
+            # 5. Run Trade Simulation
+            simulation_results = simulate_trading(df, signals, initial_investment)
+            print("\n--- Trading Simulation Results ---")
+            print(f"Initial Capital: ${simulation_results['initial_capital']:.2f}")
+            print(f"Final Portfolio Value: ${simulation_results['final_portfolio_value']:.2f}")
+            print(f"Total Profit/Loss: ${simulation_results['total_profit_loss']:.2f}")
+            print(f"Number of Trades: {simulation_results['num_trades']}")
+            print(f"Winning Trades: {simulation_results['winning_trades']}")
+            print(f"Win Rate: {simulation_results['win_rate']:.2f}%")
+            simulation_result={
+                "Initial Capital:":f"${simulation_results['initial_capital']:.2f}",
+                "Final Portfolio Value:":f"${simulation_results['final_portfolio_value']:.2f}",
+                "Total Profit/Loss:":f"${simulation_results['total_profit_loss']:.2f}",
+                "Number of Trades:":f":{simulation_results['num_trades']}",
+                "Winning Trades:":f"{simulation_results['winning_trades']}",
+                "Win Rate:":f"{simulation_results['win_rate']:.2f}%"
+            }
+            detection_result["simulation_result"]=simulation_result
+        if save_result:
+            # 6. Save result to json file
+            for key in signals:
+                dt_object = datetime.strptime(str(key), "%Y-%m-%d %H:%M:%S")    
+                formatted_date = dt_object.strftime("%A, %B %d, %Y")
+                signals_dates[formatted_date] = signals[key]
+            #print(signals_dates)        
+            filename = f"{stock_symbol}_hs_signal_detection.json"
+            with open(filename, mode="w",encoding="utf-8") as f:
+                json.dump(signals_dates, f, indent=2) 
+            print(f"Data successfully saved to {filename}")
+        
+        return detection_result, df
+
+    # ==============
+    # main analysis
+    # ==============                                                      
+    detection_result, df = detect_head_and_shoulder_patterns(stock_symbol,input_df=None,plot_result=True,save_result=True,
+                                                                             back_period="5y",start_date=None, end_date=None, data_filename=None)
+    return detection_result, df""" ;
+            rdfs:comment "This function is use to detect Head and Shoulder (H&S) and Inverse Head and Shoulder (IH&S) patterns and neckline and buy/short-sell signals in stock data with robust method." .
+
